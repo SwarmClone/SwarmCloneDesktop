@@ -2,6 +2,11 @@
 // import { ref } from "vue";
 // import { invoke } from "@tauri-apps/api/core";
 import TitleBar from "./components/TitleBar/TitleBar.vue";
+import { attachConsole, debug } from "@tauri-apps/plugin-log";
+
+attachConsole();
+
+debug("App.vue Initialized!")
 
 // const greetMsg = ref("");
 // const name = ref("");
