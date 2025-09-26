@@ -1,7 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "swarmclone-desktop-app",
-  "version": "0.1.0",
   "identifier": "com.swarmclone.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -28,6 +27,10 @@
     "targets": "all",
     "icon": [
       "icons/logo.ico"
-    ]
+    ],
+    "copyright": "Copyright © 2025 SwarmClone Organization",
+    "category": "DeveloperTool",
+    "shortDescription": "SwarmClone AI Framework",
+    "longDescription": "A Desktop Application For SwarmClone AI Framework"
   }
 }
