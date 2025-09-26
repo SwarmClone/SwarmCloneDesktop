@@ -67,9 +67,6 @@ jobs:
       - name: Install Tauri CLI
         run: npm install @tauri-apps/cli@latest
 
-      - name: Build frontend
-        run: npm run build
-
       - name: Build Tauri application
         run: npx tauri build
         env:
