@@ -3,6 +3,7 @@
   "productName": "SwarmClone Desktop",
   "version": "0.1.0",
   "identifier": "com.swarmclone.desktop",
+  "description": "A Desktop Application For SwarmClone AI Framework",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -29,7 +30,6 @@
     "icon": [
       "icons/logo.ico"
     ],
-    "copyright": "Copyright © 2025 SwarmClone and Contributors",
-    "description": "A Desktop Application For SwarmClone AI Framework"
+    "copyright": "Copyright © 2025 SwarmClone and Contributors"
   }
 }
