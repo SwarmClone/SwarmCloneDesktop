@@ -36,6 +36,12 @@ jobs:
         toolchain: stable
         profile: minimal
 
+    - name: Install system dependencies (Linux)
+      if: matrix.platform == 'linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgl1-mesa-dev libglx-dev libopengl-dev
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
