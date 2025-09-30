@@ -29,10 +29,10 @@ use encoding_rs_io::DecodeReaderBytesBuilder;
 use sysinfo::{System};
 
 #[cfg(windows)]
-static PROGRAM_NAME: &str = r"main.dist\app_main.exe";
+static PROGRAM_NAME: &str = r"main.dist\SwarmCloneDesktop.exe";
 
 #[cfg(not(windows))]
-static PROGRAM_NAME: &str = "./main.dist/app_main";
+static PROGRAM_NAME: &str = "./main.dist/SwarmCloneDesktop";
 
 
 fn gbk_to_utf8(bytes: &[u8]) -> String {

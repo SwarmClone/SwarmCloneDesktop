@@ -16,15 +16,26 @@
 # see <https://www.eclipse.org/legal/epl-2.0/>.
 import os
 import signal
+import sys
 
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QPushButton
 from .base_view import BaseView
 
-
 def test_crash():
     import ctypes
-    ctypes.string_at(0)
-    os.kill(os.getpid(), signal.SIGTERM)
+    try:
+        ctypes.memmove(0, 0x1000, 8)
+    except:
+        pass
+
+    invalid_ptr = ctypes.cast(0x5C, ctypes.POINTER(ctypes.c_int))
+    invalid_ptr.contents.value = 42
+    def overflow():
+        return overflow()
+
+    overflow()
+
+
 
 
 class HomeView(BaseView):

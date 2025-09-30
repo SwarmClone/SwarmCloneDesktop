@@ -49,6 +49,17 @@ def find_nuitka():
                 "nuitka",
             ]
         )
+def install_dependencies():
+    install_command = [
+        sys.executable,
+        "-m",
+        "pip",
+        "install",
+        "--upgrade",
+        "-r",
+        "../requirements.txt",
+    ]
+    subprocess.run(install_command, check=True)
 
 def run_nuitka_build():
     os.chdir("../build")
@@ -128,6 +139,7 @@ def run_launcher_build():
 
 def build():
     check_python()
+    install_dependencies()
     find_nuitka()
     run_nuitka_build()
     run_launcher_build()
