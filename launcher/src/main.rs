@@ -1,3 +1,4 @@
+#![cfg_attr(windows, windows_subsystem = "windows")]
 /**
  * SwarmClone Desktop
  *
@@ -17,7 +18,6 @@
  * see <https://www.eclipse.org/legal/epl-2.0/>.
  */
 
-#![cfg_attr(windows, windows_subsystem = "windows")]
 extern crate core;
 
 use chrono;
@@ -44,15 +44,63 @@ fn gbk_to_utf8(bytes: &[u8]) -> String {
     utf8
 }
 
+fn show_crash_dialog(file_path: &str)
+{
+    let text = format!("SwarmCloneDesktop主程序\n由于遇到意外或者无法解决的严重问题，现已崩溃。\n\n\
+                                崩溃日志已生成：{}\n\n\
+                                请检查日志并提交给软件维护人员。",
+                       file_path);
+
+    msgbox::create("错误",
+                   &*text,
+                   msgbox::IconType::Error).expect("Failed to create message box")
+}
+
+fn open_file_explorer(file_path: &str)
+{
+    let mut cmd = if cfg!(target_os = "windows") {
+        let mut command = Command::new("explorer");
+        command.arg(file_path);
+        command
+    } else if cfg!(target_os = "macos") {
+        let mut command = Command::new("open");
+        command.arg(file_path);
+        command
+    } else if cfg!(target_os = "linux") {
+        let mut command = Command::new("xdg-open");
+        command.arg(file_path);
+        command
+    } else {
+        // 其他平台不支持，直接返回
+        return;
+    };
+
+    match cmd.spawn() {
+        Ok(_) => {},
+        Err(_) => {
+            // 忽略打开文件浏览器的错误，不影响主要功能
+        }
+    }
+}
+
+
 fn generate_crash_log(output: Output)
 {
+    std::fs::create_dir_all("logs").expect("failed to create logs directory");
 
     let current_time = chrono::Local::now().format("%Y%m%d%H%M%S");
     let current_time_text = chrono::Local::now().format("%Y年%m月%d日%H时%M分%S秒");
 
-    let log_file = format!("crash_log_{}.log", current_time);
+    let log_file = format!("logs\\crash_log_{}.log", current_time);
 
-    let mut file = File::create(log_file).expect("failed to create file");
+    // 获取绝对路径
+    let current_dir = std::env::current_dir().expect("failed to get current directory");
+    let log_file_abs_path = current_dir.join(&log_file);
+    let log_file_abs_path_str = log_file_abs_path.to_string_lossy();
+
+    show_crash_dialog(&log_file_abs_path_str);
+
+    let mut file = File::create(&log_file).expect("failed to create file");
     let exit_code = output.status.code().unwrap_or(-1).to_string();
     let stdout = gbk_to_utf8(&output.stdout);
     let stderr = gbk_to_utf8(&output.stderr);
@@ -69,7 +117,9 @@ fn generate_crash_log(output: Output)
 
     writeln!(file, "以下是该应用程序自启动到崩溃，输出的全部信息:\n\n{}\n{}", stdout, stderr).unwrap();
 
+    open_file_explorer(&log_file_abs_path_str);
 }
+
 
 fn get_device_info() -> String {
     let mut info = String::new();
@@ -235,7 +285,22 @@ fn main() {
     match output {
         Ok(result) => {
             let exit_code = result.status.code().unwrap_or(0);
-            if exit_code != 0 {
+            let should_generate_crash_log = if result.status.success() {
+                // 程序正常退出，不需要生成崩溃日志
+                false
+            } else {
+                // 检查是否是正常的终止信号
+                if cfg!(unix) {
+                    // Unix/Linux/macOS 平台的正常终止信号
+                    exit_code != 130 && exit_code != 137 && exit_code != 143
+                } else {
+                    // Windows平台
+                    // Windows上被任务管理器结束通常返回非零但特定的退出代码
+                    exit_code < 0 || (exit_code > 1 && exit_code < 128)
+                }
+            };
+
+            if should_generate_crash_log {
                 generate_crash_log(result);
             }
             exit(exit_code)
@@ -258,6 +323,5 @@ fn main() {
             }
             exit(1);
         }
-
     }
 }

@@ -14,9 +14,17 @@
 # You should have received a copy of the Eclipse Public License 2.0
 # along with this program.  For the full text of the Eclipse Public License 2.0,
 # see <https://www.eclipse.org/legal/epl-2.0/>.
+import os
+import signal
 
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QPushButton
 from .base_view import BaseView
+
+
+def test_crash():
+    import ctypes
+    ctypes.string_at(0)
+    os.kill(os.getpid(), signal.SIGTERM)
 
 
 class HomeView(BaseView):
@@ -36,6 +44,10 @@ class HomeView(BaseView):
         self.settings_button = QPushButton("进入设置")
         self.settings_button.clicked.connect(self.go_to_settings)
         layout.addWidget(self.settings_button)
+
+        self.test_button = QPushButton("发起测试崩溃")
+        self.test_button.clicked.connect(test_crash)
+        layout.addWidget(self.test_button)
 
         layout.addWidget(self.title_label)
 

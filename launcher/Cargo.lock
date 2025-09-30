@@ -11,6 +11,7 @@ dependencies = [
  "encoding_rs_io",
  "msgbox",
  "sysinfo",
+ "winapi",
 ]
 
 [[package]]

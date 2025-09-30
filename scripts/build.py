@@ -18,6 +18,7 @@
 import os
 import subprocess
 import sys
+import shutil
 from pathlib import Path
 
 
@@ -57,7 +58,7 @@ def run_nuitka_build():
         "nuitka",
         "--standalone",
         "--plugin-enable=pyside6",
-        "-o", "app_main",
+        "-o", "SwarmCloneDesktop",
         "../src/main.py",
         "--remove-output",
         "--no-pyi-file",
@@ -122,7 +123,8 @@ def run_launcher_build():
               "这可能是因为cargo构建启动器失败了。\n"
               "建议您检查自己的构建环境然后重试")
         sys.exit(1)
-    exe_path.copy(Path("../build/"))
+
+    shutil.copy(exe_path, Path("../build/"))
 
 def build():
     check_python()
