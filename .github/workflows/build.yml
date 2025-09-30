@@ -53,6 +53,10 @@ jobs:
       run: |
         pip install --upgrade nuitka
 
+    - name: Create build directory
+      run: |
+        mkdir -p build
+
     - name: Build with Python script (Linux)
       if: matrix.platform == 'linux'
       working-directory: scripts
