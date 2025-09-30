@@ -62,21 +62,21 @@ jobs:
 
     - name: Upload artifacts (Linux)
       if: matrix.platform == 'linux'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: SwarmCloneDesktop-linux
         path: build/SwarmCloneDesktop*
 
     - name: Upload artifacts (Windows)
       if: matrix.platform == 'windows'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: SwarmCloneDesktop-windows
         path: build/SwarmCloneDesktop*
 
     - name: Upload artifacts (macOS)
       if: matrix.platform == 'macos'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: SwarmCloneDesktop-macos
         path: build/SwarmCloneDesktop*
