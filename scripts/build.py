@@ -108,7 +108,7 @@ def run_nuitka_build():
     elif sys.platform == "darwin":
         build_command.append("--macos-create-app-bundle")    # 创建 MacOS 应用包
         if os.path.exists(icon_paths["darwin"]):
-            build_command.append(f"--macos-icon={icon_paths['darwin']}")
+            build_command.append(f"--macos-app-icon={icon_paths['darwin']}")
         else:
             print(f"警告：未找到macOS图标文件 {icon_paths['darwin']}")
 
