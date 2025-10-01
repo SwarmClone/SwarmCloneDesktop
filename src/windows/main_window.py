@@ -14,62 +14,124 @@
 # You should have received a copy of the Eclipse Public License 2.0
 # along with this program.  For the full text of the Eclipse Public License 2.0,
 # see <https://www.eclipse.org/legal/epl-2.0/>.
+from PySide6.QtCore import QObject
+from PySide6.QtGui import QPalette, QColor
+from PySide6.QtWidgets import QMainWindow, QStackedWidget, QWidget, QVBoxLayout
 
-from typing import Any
-
-from PySide6.QtWidgets import QMainWindow, QStackedWidget, QVBoxLayout, QWidget
-from PySide6.QtCore import Slot
-
-from views import HomeView, SettingsView
+from views.home_views import HomeView
+from views.settings_views import SettingsView
 from models.app_state import StateManager
 from models.data_manager import DataManager
-
+from models.theme_manager import ThemeManager
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowTitle("SwarmClone Desktop")
+        self.setGeometry(100, 100, 1100, 650)
 
-        self.settings_view = None
-        self.home_view = None
-        self.view_stack = None
-        self.central_widget = None
         self.state_manager = StateManager()
         self.data_manager = DataManager(self.state_manager)
-
-        self.setup_ui()
-        self.connect_signals()
-
-    def setup_ui(self):
-        self.setWindowTitle("SwarmClone Desktop")
-        self.setGeometry(100, 100, 1100, 600)
+        self.theme_manager = ThemeManager()
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
-        layout = QVBoxLayout(self.central_widget)
-
         self.view_stack = QStackedWidget()
+
+        self.views = {}
+        self.create_views()
+
+        layout = QVBoxLayout(self.central_widget)
         layout.addWidget(self.view_stack)
+        layout.setContentsMargins(0, 0, 0, 0)
 
-        self.home_view = HomeView(self.state_manager, self.data_manager)
-        self.settings_view = SettingsView(self.state_manager, self.data_manager)
-
-        self.view_stack.addWidget(self.home_view)
-        self.view_stack.addWidget(self.settings_view)
-
-    def connect_signals(self):
-        # 连接状态变化信号
         self.state_manager.state_changed.connect(self.on_state_changed)
+        self.theme_manager.themeChanged.connect(self.apply_theme)
 
-    @Slot(str, object)
-    def on_state_changed(self, key: str, value: Any):
-        if key == 'current_view':
-            self.switch_view(value)
+        # 显示初始视图后再应用主题
+        self.switch_view("home")
+        self.apply_theme(self.theme_manager.current_theme)
+
+    def create_views(self):
+        self.views["home"] = HomeView(self.state_manager, self.data_manager)
+        self.views["settings"] = SettingsView(self.state_manager, self.data_manager)
+
+        for view in self.views.values():
+            self.view_stack.addWidget(view)
 
     def switch_view(self, view_name: str):
-        view_map = {
-            'home': 0,
-            'settings': 1
-        }
-        index = view_map.get(view_name, 0)
-        self.view_stack.setCurrentIndex(index)
+        if view_name in self.views:
+            index = list(self.views.keys()).index(view_name)
+            self.view_stack.setCurrentIndex(index)
+
+    def on_state_changed(self, key: str, value):
+        if key == "current_view":
+            self.switch_view(value)
+
+    def apply_theme(self, theme_name: str):
+        theme = self.theme_manager.get_theme(theme_name)
+
+        palette = self.palette()
+
+        palette.setColor(QPalette.Window, QColor(theme["background"]))
+        palette.setColor(QPalette.Base, QColor(theme["foreground"]))
+        palette.setColor(QPalette.WindowText, QColor(theme["text"]))
+        palette.setColor(QPalette.Text, QColor(theme["text"]))
+        palette.setColor(QPalette.Button, QColor(theme["button_background"]))
+        palette.setColor(QPalette.ButtonText, QColor(theme["button_text"]))
+        palette.setColor(QPalette.Mid, QColor(theme["border"]))
+
+        self.setPalette(palette)
+
+        stylesheet = f"""
+            QMainWindow {{
+                background-color: {theme["background"]};
+            }}
+            
+            QWidget {{
+                color: {theme["text"]};
+                background-color: {theme["background"]};
+            }}
+            
+            QPushButton {{
+                background-color: {theme["button_background"]};
+                color: {theme["button_text"]};
+                border: 1px solid {theme["border"]};
+                padding: 6px;
+                border-radius: 4px;
+                min-width: 80px;
+            }}
+            
+            QPushButton:hover {{
+                background-color: {theme["button_hover"]};
+            }}
+            
+            QPushButton:pressed {{
+                background-color: {theme["button_hover"]};
+            }}
+            
+            QLabel {{
+                color: {theme["text"]};
+            }}
+        """
+
+        self.setStyleSheet(stylesheet)
+
+        # 更新所有子控件
+        self.update_styles_recursive(self)
+
+    def update_styles_recursive(self, widget):
+        if isinstance(widget, QObject) and hasattr(widget, 'style'):
+            try:
+                widget.style().unpolish(widget)
+                widget.style().polish(widget)
+                widget.update(widget.rect())
+            except Exception:
+                # 如果更新出错，跳过更新
+                pass
+
+        # 递归更新子控件
+        for child in widget.children():
+            if isinstance(child, QObject):
+                self.update_styles_recursive(child)
