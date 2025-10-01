@@ -38,7 +38,7 @@ class DataManager(QObject):
             except Exception as e:
                 print(f"Error loading data: {e}")
 
-        # 异步加载
+        # async loading
         self.state_manager.set('is_loading', True)
         QTimer.singleShot(0, load_task)
 

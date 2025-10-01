@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
         self.state_manager.state_changed.connect(self.on_state_changed)
         self.theme_manager.themeChanged.connect(self.apply_theme)
 
-        # 显示初始视图后再应用主题
+        # Apply theme after showing the initial view
         self.switch_view("home")
         self.apply_theme(self.theme_manager.current_theme)
 
@@ -118,7 +118,7 @@ class MainWindow(QMainWindow):
 
         self.setStyleSheet(stylesheet)
 
-        # 更新所有子控件
+        # Update all child widgets
         self.update_styles_recursive(self)
 
     def update_styles_recursive(self, widget):
@@ -128,10 +128,10 @@ class MainWindow(QMainWindow):
                 widget.style().polish(widget)
                 widget.update(widget.rect())
             except Exception:
-                # 如果更新出错，跳过更新
+                # Skip update if an error occurs
                 pass
 
-        # 递归更新子控件
+        # Recursively update child widgets
         for child in widget.children():
             if isinstance(child, QObject):
                 self.update_styles_recursive(child)

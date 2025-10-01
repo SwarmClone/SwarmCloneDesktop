@@ -1,3 +1,4 @@
+#file:E:\Code\Python\SwarmCloneDesktop\src\models\app_state.py
 # SwarmClone Desktop
 #
 # Copyright (C) 2025 SwarmClone <https://github.com/SwarmClone> and contributors
@@ -15,9 +16,9 @@
 # along with this program.  For the full text of the Eclipse Public License 2.0,
 # see <https://www.eclipse.org/legal/epl-2.0/>.
 
-from PySide6.QtCore import QObject, Signal
-from dataclasses import dataclass
 from typing import Any
+from dataclasses import dataclass
+from PySide6.QtCore import QObject, Signal
 
 
 @dataclass
@@ -28,7 +29,7 @@ class AppState:
 
 
 class StateManager(QObject):
-    """程序状态管理器"""
+    """Application state manager"""
     state_changed = Signal(str, object)  # key, value
 
     def __init__(self):

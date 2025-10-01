@@ -68,11 +68,11 @@ class HomeView(BaseView):
         layout.addLayout(button_layout)
         layout.addWidget(self.title_label)
 
-        # 初始化下拉框选中项
+        # Initialize dropdown selection
         self.init_theme_combo()
 
     def init_theme_combo(self):
-        """初始化主题下拉框选中项"""
+        """Initialize theme dropdown selection"""
         main_window = self.window()
         if hasattr(main_window, 'theme_manager'):
             current_theme = main_window.theme_manager.current_theme
@@ -84,9 +84,9 @@ class HomeView(BaseView):
         self.state_manager.set('current_view', 'settings')
 
     def on_theme_changed(self, index):
-        """主题选择改变时的处理函数"""
+        """Handler function when theme selection changes"""
         theme_id = self.theme_combo.itemData(index)
-        # 获取主窗口并应用主题
+        # Get main window and apply theme
         main_window = self.window()
         if hasattr(main_window, 'theme_manager'):
             main_window.theme_manager.set_theme(theme_id)

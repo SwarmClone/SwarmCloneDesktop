@@ -20,31 +20,33 @@ import sys
 
 def get_assets(asset_path: str) -> str:
     """
-    获取资源文件的绝对路径，兼容开发环境和打包后的环境
+    Get the absolute path of resource files,
+    compatible with development and packaged environments
 
     Args:
-        asset_path (str): 相对于assets目录的文件路径，如 "images/close.png"
+        asset_path (str): File path relative to
+                        the assets directory, e.g. "images/close.png"
 
     Returns:
-        str: 资源文件的绝对路径
+        str: Absolute path of the resource file
     """
 
-    # 检查是否在Nuitka打包环境中运行
+    # Check if running in Nuitka packaging environment
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        # PyInstaller 打包环境
+        # PyInstaller packaging environment
         base_path = sys._MEIPASS
     elif getattr(sys, 'frozen', False):
-        # Nuitka 打包环境
+        # Nuitka packaging environment
         base_path = os.path.dirname(sys.executable)
     else:
-        # 在开发环境中，使用当前文件所在目录作为基准
+        # In development environment, use the current file's directory as the base
         base_path = os.path.dirname(os.path.abspath(__file__))
-        base_path = os.path.dirname(base_path)  # 从utils目录到src目录
+        base_path = os.path.dirname(base_path)  # From utils directory to src directory
 
     full_path = os.path.join(base_path, asset_path)
 
-    # 验证路径是否存在
+    # Verify that the path exists
     if not os.path.exists(full_path):
-        raise FileNotFoundError(f"资源文件未找到: {full_path}")
+        raise FileNotFoundError(f"Resource file not found: {full_path}")
 
     return full_path

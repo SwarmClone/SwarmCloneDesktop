@@ -46,12 +46,12 @@ fn gbk_to_utf8(bytes: &[u8]) -> String {
 
 fn show_crash_dialog(file_path: &str)
 {
-    let text = format!("SwarmCloneDesktop主程序\n由于遇到意外或者无法解决的严重问题，现已崩溃。\n\n\
-                                崩溃日志已生成：{}\n\n\
-                                请检查日志并提交给软件维护人员。",
+    let text = format!("SwarmCloneDesktop Main Program\nAn unexpected or unrecoverable error has occurred, and the program has crashed.\n\n\
+                                Crash log generated: {}\n\n\
+                                Please check the log and submit it to the software maintainers.",
                        file_path);
 
-    msgbox::create("错误",
+    msgbox::create("Error",
                    &*text,
                    msgbox::IconType::Error).expect("Failed to create message box")
 }
@@ -71,14 +71,15 @@ fn open_file_explorer(file_path: &str)
         command.arg(file_path);
         command
     } else {
-        // 其他平台不支持，直接返回
+        // Other platforms not supported, return directly
         return;
     };
 
     match cmd.spawn() {
         Ok(_) => {},
         Err(_) => {
-            // 忽略打开文件浏览器的错误，不影响主要功能
+            // Ignore errors when opening file explorer,
+            // does not affect main functionality
         }
     }
 }
@@ -89,11 +90,11 @@ fn generate_crash_log(output: Output)
     std::fs::create_dir_all("logs").expect("failed to create logs directory");
 
     let current_time = chrono::Local::now().format("%Y%m%d%H%M%S");
-    let current_time_text = chrono::Local::now().format("%Y年%m月%d日%H时%M分%S秒");
+    let current_time_text = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
 
     let log_file = format!("logs\\crash_log_{}.log", current_time);
 
-    // 获取绝对路径
+    // Get absolute path
     let current_dir = std::env::current_dir().expect("failed to get current directory");
     let log_file_abs_path = current_dir.join(&log_file);
     let log_file_abs_path_str = log_file_abs_path.to_string_lossy();
@@ -105,9 +106,9 @@ fn generate_crash_log(output: Output)
     let stdout = gbk_to_utf8(&output.stdout);
     let stderr = gbk_to_utf8(&output.stderr);
 
-    writeln!(file, "应用程序 '{}' 于 {} 遇到意外发生且无法自行解决的严重错误，现在已经崩溃。\n\
-            退出代码: {} \n\
-            请将本日志提交给软件维护人员，方便我们解决问题。", PROGRAM_NAME, current_time_text,  exit_code).unwrap();
+    writeln!(file, "Application '{}' encountered an unexpected and unrecoverable error at {} and has crashed.\n\
+            Exit code: {} \n\
+            Please submit this log to the software maintainers to help us resolve the issue.", PROGRAM_NAME, current_time_text,  exit_code).unwrap();
 
     writeln!(file, "--------------------").unwrap();
 
@@ -115,7 +116,7 @@ fn generate_crash_log(output: Output)
 
     writeln!(file, "--------------------").unwrap();
 
-    writeln!(file, "以下是该应用程序自启动到崩溃，输出的全部信息:\n\n{}\n{}", stdout, stderr).unwrap();
+    writeln!(file, "Below is all the output information from this application from startup to crash:\n\n{}\n{}", stdout, stderr).unwrap();
 
     open_file_explorer(&log_file_abs_path_str);
 }
@@ -126,18 +127,18 @@ fn get_device_info() -> String {
     let mut sys = System::new_all();
     sys.refresh_all();
 
-    info.push_str(&format!("操作系统：{} {}\n", System::long_os_version().unwrap(), System::kernel_version().unwrap()));
-    info.push_str(&format!("CPU型号：{}\n", sys.cpus()[0].brand()));
-    info.push_str(&format!("CPU核心数量：{}\n", sys.cpus().len()));
+    info.push_str(&format!("Operating System: {} {}\n", System::long_os_version().unwrap(), System::kernel_version().unwrap()));
+    info.push_str(&format!("CPU Model: {}\n", sys.cpus()[0].brand()));
+    info.push_str(&format!("CPU Core Count: {}\n", sys.cpus().len()));
 
-    info.push_str("GPU信息：\n");
+    info.push_str("GPU Information:\n");
     match get_gpu_info() {
         Ok(gpu_info) => info.push_str(&gpu_info),
-        Err(_) => info.push_str("无法获取GPU信息\n"),
+        Err(_) => info.push_str("Unable to get GPU information\n"),
     }
 
-    info.push_str(&format!("总内存：{} GB\n", sys.total_memory() / 1024 / 1024 / 1024));
-    info.push_str(&format!("已使用内存：{} GB", sys.used_memory() / 1024 / 1024 / 1024));
+    info.push_str(&format!("Total Memory: {} GB\n", sys.total_memory() / 1024 / 1024 / 1024));
+    info.push_str(&format!("Used Memory: {} GB", sys.used_memory() / 1024 / 1024 / 1024));
 
     info
 }
@@ -146,7 +147,8 @@ fn get_gpu_info() -> Result<String, Box<dyn std::error::Error>> {
 
     #[cfg(windows)]
     {
-        // 在Windows上优先使用PowerShell获取GPU信息，因为wmic在新版本Windows中已被弃用
+        // On Windows, prefer using PowerShell to get GPU information
+        // as wmic is deprecated in newer Windows versions
         let output = Command::new("powershell")
             .args([
                 "-Command",
@@ -163,14 +165,14 @@ fn get_gpu_info() -> Result<String, Box<dyn std::error::Error>> {
                 .collect();
 
             if lines.is_empty() {
-                gpu_info.push_str("  未检测到GPU设备\n");
+                gpu_info.push_str("  No GPU devices detected\n");
             } else {
                 for (i, gpu_name) in lines.iter().enumerate() {
                     gpu_info.push_str(&format!("  GPU {}: {}\n", i + 1, gpu_name));
                 }
             }
         } else {
-            // 备用方法：使用旧版wmic命令
+            // Fallback method: use the old wmic command
             let backup_output = Command::new("wmic")
                 .args(["path", "win32_videocontroller", "get", "name", "/value"])
                 .output()?;
@@ -188,17 +190,17 @@ fn get_gpu_info() -> Result<String, Box<dyn std::error::Error>> {
                     }
                 }
                 if gpu_count == 1 {
-                    gpu_info.push_str("  未检测到GPU设备\n");
+                    gpu_info.push_str("  No GPU devices detected\n");
                 }
             } else {
-                gpu_info.push_str("  无法获取GPU详细信息\n");
+                gpu_info.push_str("  Unable to get detailed GPU information\n");
             }
         }
     }
 
     #[cfg(target_os = "macos")]
     {
-        // 在macOS上使用system_profiler获取GPU信息
+        // On macOS, use system_profiler to get GPU information
         let output = Command::new("system_profiler")
             .args(["SPDisplaysDataType"])
             .output();
@@ -215,18 +217,18 @@ fn get_gpu_info() -> Result<String, Box<dyn std::error::Error>> {
                     }
                 }
                 if gpu_count == 1 {
-                    gpu_info.push_str("  未检测到GPU设备\n");
+                    gpu_info.push_str("  No GPU devices detected\n");
                 }
             }
             Err(_) => {
-                gpu_info.push_str("  无法获取GPU详细信息\n");
+                gpu_info.push_str("  Unable to get detailed GPU information\n");
             }
         }
     }
 
     #[cfg(all(unix, not(target_os = "macos")))]
     {
-        // 在Linux上尝试使用lspci获取GPU信息
+        // On Linux, try to use lspci to get GPU information
         let output = Command::new("lspci")
             .args(["-vnn"])
             .output()
@@ -245,17 +247,17 @@ fn get_gpu_info() -> Result<String, Box<dyn std::error::Error>> {
                     }
                 }
                 if gpu_count == 1 {
-                    gpu_info.push_str("  未检测到GPU设备\n");
+                    gpu_info.push_str("  No GPU devices detected\n");
                 }
             }
             Err(_) => {
-                gpu_info.push_str("  无法获取GPU详细信息\n");
+                gpu_info.push_str("  Unable to get detailed GPU information\n");
             }
         }
     }
 
     if gpu_info.is_empty() {
-        gpu_info.push_str("  无GPU信息可用\n");
+        gpu_info.push_str("  No GPU information available\n");
     }
 
     Ok(gpu_info)
@@ -265,10 +267,10 @@ fn get_gpu_info() -> Result<String, Box<dyn std::error::Error>> {
 fn check_program_exist() {
     if !std::path::Path::new(PROGRAM_NAME).exists() {
         msgbox::create(
-            "错误",
-            "找不到 SwarmCloneDesktop 核心主程序，\n\n\
-            这说明 SwarmCloneDesktop 程序文件已经损坏。\n\n\
-            请您尝试重新安装来解决此问题",
+            "Error",
+            "Cannot find the SwarmCloneDesktop core program.\n\n\
+            This indicates that the SwarmCloneDesktop program files are corrupted.\n\n\
+            Please try reinstalling to resolve this issue.",
             msgbox::IconType::Error
         ).expect("failed to show messagebox");
         exit(1);
@@ -286,16 +288,17 @@ fn main() {
         Ok(result) => {
             let exit_code = result.status.code().unwrap_or(0);
             let should_generate_crash_log = if result.status.success() {
-                // 程序正常退出，不需要生成崩溃日志
+                // Program exited normally, no need to generate crash log
                 false
             } else {
-                // 检查是否是正常的终止信号
+                // Check if it's a normal termination signal
                 if cfg!(unix) {
-                    // Unix/Linux/macOS 平台的正常终止信号
+                    // Normal termination signals on Unix/Linux/macOS platforms
                     exit_code != 130 && exit_code != 137 && exit_code != 143
                 } else {
-                    // Windows平台
-                    // Windows上被任务管理器结束通常返回非零但特定的退出代码
+                    // Windows platform
+                    // On Windows, being terminated by Task Manager usually returns
+                    // a non-zero but specific exit code
                     exit_code < 0 || (exit_code > 1 && exit_code < 128)
                 }
             };
@@ -308,16 +311,16 @@ fn main() {
         Err(e) => {
             if e.kind() == std::io::ErrorKind::NotFound {
                 msgbox::create(
-                    "错误",
-                    "找不到 SwarmCloneDesktop 核心主程序，\n\n\
-                    这说明 SwarmCloneDesktop 程序文件已经损坏。\n\n\
-                    请您尝试重新安装来解决此问题",
+                    "Error",
+                    "Cannot find the SwarmCloneDesktop core program.\n\n\
+                    This indicates that the SwarmCloneDesktop program files are corrupted.\n\n\
+                    Please try reinstalling to resolve this issue.",
                     msgbox::IconType::Error
                 ).expect("failed to show messagebox");
             } else {
                 msgbox::create(
-                    "错误",
-                    &format!("无法启动核心程序: {}。请检查程序文件权限或完整性。", e),
+                    "Error",
+                    &format!("Unable to start core program: {}. Please check program file permissions or integrity.", e),
                     msgbox::IconType::Error
                 ).expect("failed to show messagebox");
             }

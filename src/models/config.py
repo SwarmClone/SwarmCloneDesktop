@@ -1,3 +1,4 @@
+#file:E:\Code\Python\SwarmCloneDesktop\src\models\config.py
 # SwarmClone Desktop
 #
 # Copyright (C) 2025 SwarmClone <https://github.com/SwarmClone> and contributors
@@ -81,21 +82,21 @@ class _Config(Dict[str, Any]):
         if cls._instance is None:
             cls._instance = super().__new__(cls)    # type: ignore
             cls._instance._worker = ConfigWorker(_JSON_PATH)
-            # 同步初始数据到 dict
+            # Synchronize initial data to dict
             cls._instance.update(cls._instance._worker.data)
         return cls._instance
 
-    # 如果涉及用户外部修改配置文件，需要调用这个函数
-    # 虽然目前来说不太可能...
+    # Call this function if the configuration file is modified externally by the user
+    # Although this is unlikely at the moment...
     def reload(self):
         self._worker.load()
 
-    # 立即保存
-    # 这个函数在一些需要频繁修改配置的场景或许有用
+    # Save immediately
+    # This function might be useful in scenarios where configuration changes frequently
     def save(self):
         self._worker.dump()
 
-    # 程序退出前必须调用以确保所有数据都被保存
+    # Must be called before program exits to ensure all data is saved
     def cleanup(self) -> None:
         self._worker.prepare_shutdown()
         self._worker.dump()
@@ -105,17 +106,17 @@ class _Config(Dict[str, Any]):
             self[key] = default
         return self[key]
 
-    # 支持通过 cfg['key'] = value 赋值
+    # Supports assignment via cfg['key'] = value
     def __setitem__(self, key: str, value: Any) -> None:
         self._worker.data[key] = value
         self._worker.trigger_save()
 
-    # 支持通过 cfg['key'] 访问
+    # Supports access via cfg['key']
     def __getitem__(self, key):
         return self._worker.data[key]
 
-    # 建议使用这个，因为如果键值不存在就不需要再写 if else 来替换为默认值
-    # 或者也可以提前使用 set_default 来设置默认值
+    # Recommended to use this, as there's no need to write if-else statements to replace with default values if the key doesn't exist
+    # Or you can also use set_default in advance to set default values
     def get(self, key, default=None):
         return self._worker.data.get(key, default)
 

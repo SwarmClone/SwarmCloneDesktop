@@ -7,13 +7,11 @@ fn main() {
     {
         let rc_path = "res/windows.rc";
 
-        // 检查资源文件是否存在
         if !Path::new(rc_path).exists() {
             println!("cargo:warning=Resource file not found: {}", rc_path);
             return;
         }
 
-        // 检查图标文件是否存在
         let icon_path = "assets/icon.ico";
         if !Path::new(icon_path).exists() {
             println!("cargo:warning=Icon file not found: {}", icon_path);
@@ -55,7 +53,6 @@ fn main() {
                     if !result.status.success() {
                         println!("cargo:warning=Resource compilation failed, but continuing build...");
                     } else {
-                        // 确保资源文件被正确链接
                         println!("cargo:rustc-link-arg={}", res_path);
                     }
                 }

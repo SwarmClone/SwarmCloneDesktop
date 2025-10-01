@@ -20,9 +20,8 @@ from typing import Any
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Slot
 
-
 class BaseView(QWidget):
-    """所有视图的基类"""
+    """Base class for all views"""
 
     def __init__(self, state_manager, data_manager, parent=None):
         super().__init__(parent)
@@ -32,7 +31,7 @@ class BaseView(QWidget):
         self.connect_signals()
 
     def setup_ui(self):
-        """子类必须实现此方法"""
+        """Subclasses must implement this method"""
         raise NotImplementedError
 
     def connect_signals(self):
@@ -41,10 +40,10 @@ class BaseView(QWidget):
 
     @Slot(str, object)
     def on_state_changed(self, key: str, value: Any):
-        """处理状态变化"""
+        """Handle state changes"""
         pass
 
     @Slot(dict)
     def on_data_loaded(self, data_dict: dict):
-        """处理数据加载完成"""
+        """Handle data loading completion"""
         pass

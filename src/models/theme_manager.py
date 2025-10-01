@@ -22,7 +22,7 @@ from PySide6.QtWidgets import QApplication
 
 
 class ThemeManager(QObject):
-    themeChanged = Signal(str)  # 发送主题名称
+    themeChanged = Signal(str)  # Emit theme name
 
     def __init__(self):
         super().__init__()
@@ -36,7 +36,7 @@ class ThemeManager(QObject):
                 "button_text": "#FFFFFF",
                 "button_background": "#1772F6",
                 "button_hover": "#1976D2",
-                "border": "#BDBDBD"
+                "border": "#BDBDBD",
             },
             "dark": {
                 "primary_color": "#2196F3",
@@ -44,9 +44,9 @@ class ThemeManager(QObject):
                 "foreground": "#424242",
                 "text": "#FFFFFF",
                 "button_text": "#FFFFFF",
-                "button_background": "#2579BE",
+                "button_background": "#0870E4",
                 "button_hover": "#1976D2",
-                "border": "#757575"
+                "border": "#757575",
             },
             "light": {
                 "primary_color": "#2196F3",
@@ -54,9 +54,9 @@ class ThemeManager(QObject):
                 "foreground": "#FFFFFF",
                 "text": "#212121",
                 "button_text": "#FFFFFF",
-                "button_background": "#0078D4",
+                "button_background": "#0870E4",
                 "button_hover": "#1976D2",
-                "border": "#E0E0E0"
+                "border": "#E0E0E0",
             }
         }
 
@@ -69,25 +69,26 @@ class ThemeManager(QObject):
         return self._themes
 
     def get_theme(self, theme_name: str) -> Dict[str, str]:
-        # 如果是默认主题，根据系统主题决定实际使用的主题
+        # If it's the default theme,
+        # determine the actual theme based on system theme
         if theme_name == "default":
             return self.get_system_theme()
         return self._themes.get(theme_name, self._themes["dark"])
 
     def get_system_theme(self) -> Dict[str, str]:
-        """根据系统设置获取主题"""
+        """Get theme based on system settings"""
         try:
-            # 检查系统主题设置
+            # Check system theme settings
             palette = QApplication.palette()
             window_color = palette.color(QPalette.Window)
 
-            # 如果窗口背景较暗，则使用深色主题
+            # Use dark theme if window background is dark
             if window_color.lightness() < 128:
                 return self._themes["dark"]
             else:
                 return self._themes["light"]
         except:
-            # 出错时默认使用深色主题
+            # Default to dark theme if an error occurs
             return self._themes["dark"]
 
     def set_theme(self, theme_name: str):

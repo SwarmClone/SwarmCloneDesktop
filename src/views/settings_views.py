@@ -15,7 +15,7 @@
 # along with this program.  For the full text of the Eclipse Public License 2.0,
 # see <https://www.eclipse.org/legal/epl-2.0/>.
 
-from PySide6.QtWidgets import QVBoxLayout,QLabel
+from PySide6.QtWidgets import QVBoxLayout
 from .base_view import BaseView
 from PySide6.QtWidgets import QPushButton
 
