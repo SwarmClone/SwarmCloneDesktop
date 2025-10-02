@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "SwarmCloneDesktop",
+  "version": "0.1.0",
+  "identifier": "com.swarmclone.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "SwarmClone Desktop",
+        "width": 1100,
+        "height": 650,
+        "decorations": false,
+        "resizable": true,
+        "transparent":  true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "copyright": "Copyright (c) 2025 SwarmClone and contributors",
+    "publisher": "SwarmClone and contributors",
+    "longDescription": "SwarmClone AI Framework",
+    "shortDescription": "SwarmClone AI Framework",
+    "category": "Developer Tool",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}
