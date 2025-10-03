@@ -13,10 +13,21 @@
     "windows": [
       {
         "title": "SwarmClone Desktop",
+        "label": "main",
         "width": 1100,
         "height": 650,
         "decorations": false,
         "resizable": true,
+        "transparent":  true
+      },
+      {
+        "title": "Live2d Window",
+        "label": "live2d",
+        "width": 400,
+        "height": 600,
+        "decorations": false,
+        "resizable": true,
+        "visible": false,
         "transparent":  true
       }
     ],
