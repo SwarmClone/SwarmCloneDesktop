@@ -1,0 +1,47 @@
+{
+  "name": "swarmclone-desktop",
+  "version": "0.3.0",
+  "license": "EPL-2.0",
+  "description": "SwarmClone Desktop Application",
+  "author": "SwarmClone and contributors",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && electron-builder",
+    "preview": "vite preview"
+  },
+  "build": {
+    "appId": "com.swarmclone.desktop",
+    "productName": "SwarmClone Desktop App",
+    "buildVersion": "0.3.0",
+    "copyright": "Copyright (c) 2025 SwarmClone and contributors",
+    "directories": {
+      "output": "dist_electron"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/main.js",
+      "node_modules/**/*"
+    ],
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "dependencies": {
+    "vue": "^3.5.24"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/tsconfig": "^0.8.1",
+    "electron": "^39.2.0",
+    "electron-builder": "^26.0.12",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.2",
+    "vite-plugin-electron": "^0.29.0",
+    "vue-tsc": "^3.1.3"
+  }
+}
